@@ -4,7 +4,6 @@ import ReactMarkdown from "react-markdown";
 import "./App.css";
 
 const API = "https://notes-backend-k48z.onrender.com/notes";
-
 function App() {
   const [notes, setNotes] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
