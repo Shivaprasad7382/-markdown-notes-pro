@@ -4,7 +4,9 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "*"
+}));
 app.use(bodyParser.json());
 
 const db = new sqlite3.Database("./notes.db");
@@ -15,6 +17,7 @@ db.run(`CREATE TABLE IF NOT EXISTS notes (
   content TEXT
 )`);
 
+// GET
 app.get("/notes", (req, res) => {
   db.all("SELECT * FROM notes", [], (err, rows) => {
     if (err) return res.status(500).json(err);
@@ -22,9 +25,11 @@ app.get("/notes", (req, res) => {
   });
 });
 
+// POST
 app.post("/notes", (req, res) => {
   const { title, content } = req.body;
-  db.run("INSERT INTO notes (title, content) VALUES (?, ?)",
+  db.run(
+    "INSERT INTO notes (title, content) VALUES (?, ?)",
     [title, content],
     function (err) {
       if (err) return res.status(500).json(err);
@@ -33,9 +38,11 @@ app.post("/notes", (req, res) => {
   );
 });
 
+// PUT
 app.put("/notes/:id", (req, res) => {
   const { title, content } = req.body;
-  db.run("UPDATE notes SET title=?, content=? WHERE id=?",
+  db.run(
+    "UPDATE notes SET title=?, content=? WHERE id=?",
     [title, content, req.params.id],
     function (err) {
       if (err) return res.status(500).json(err);
@@ -44,8 +51,10 @@ app.put("/notes/:id", (req, res) => {
   );
 });
 
+// DELETE
 app.delete("/notes/:id", (req, res) => {
-  db.run("DELETE FROM notes WHERE id=?",
+  db.run(
+    "DELETE FROM notes WHERE id=?",
     [req.params.id],
     function (err) {
       if (err) return res.status(500).json(err);
@@ -54,4 +63,9 @@ app.delete("/notes/:id", (req, res) => {
   );
 });
 
-app.listen(5000, () => console.log("Server running on port 5000"));
+// ✅ IMPORTANT FIX
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
